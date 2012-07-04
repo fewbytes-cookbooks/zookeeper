@@ -96,7 +96,7 @@ if node.role?("zookeeper")
 else
   zk_servers = []
 end
-zk_servers += search(:node, "role:kafka OR role:zookeeper OR zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
+zk_servers += search(:node, "zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
 
 zk_servers.sort! { |a, b| a.name <=> b.name }
 
