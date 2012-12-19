@@ -13,4 +13,3 @@ end
 
 depends "java"
 depends "runit"
-depends "fewbytes-common"

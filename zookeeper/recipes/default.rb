@@ -20,7 +20,7 @@ include_recipe "java"
 include_recipe "runit"
 
 remote_file "/tmp/zookeeper-#{node[:zookeeper][:version]}.tar.gz" do
-  source "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
+  source "http://mirrors.ibiblio.org/pub/mirrors/apache/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
   mode "0644"
 end
 
@@ -106,7 +106,7 @@ template "/etc/zookeeper/zoo.cfg" do
   variables(:servers => zk_servers)
 end
 
-#include_recipe "zookeeper::ebs_volume"
+include_recipe "zookeeper::ebs_volume"
 
 directory node[:zookeeper][:data_dir] do
   recursive true
