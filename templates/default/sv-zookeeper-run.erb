@@ -1,11 +1,11 @@
 #!/bin/bash
 
 exec 2>&1
-CLASSPATH="/etc/zookeeper:/usr/lib/zookeeper/*:/usr/lib/zookeeper/lib/*"
+CLASSPATH="<%= node[:zookeeper][:conf_dir] %>:/usr/local/zookeeper/*:/usr/local/zookeeper/lib/*"
 ZOOMAIN="org.apache.zookeeper.server.quorum.QuorumPeerMain"
-ZOOCFG="/etc/zookeeper/zoo.cfg"
+ZOOCFG="<%= node[:zookeeper][:conf_dir] %>/zoo.cfg"
 
-ZOO_LOG_DIR="."
+ZOO_LOG_DIR="<%= node[:zookeeper][:log_dir] %>"
 ZOO_LOG4J_PROP="INFO,CONSOLE"
 
 exec chpst -u zookeeper java  "-Dzookeeper.log.dir=${ZOO_LOG_DIR}" "-Dzookeeper.root.logger=${ZOO_LOG4J_PROP}" -cp $CLASSPATH $JVMFLAGS $ZOOMAIN $ZOOCFG

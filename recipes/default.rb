@@ -19,9 +19,10 @@
 include_recipe "java"
 include_recipe "runit"
 
-remote_file "/tmp/zookeeper-#{node[:zookeeper][:version]}.tar.gz" do
-  source "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
-  mode "0644"
+ark "zookeeper" do
+  url "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
+  checksum node[:zookeeper][:checksum] if node[:zookeeper][:checksum]
+  action :install
 end
 
 user "zookeeper" do
@@ -29,16 +30,15 @@ user "zookeeper" do
   gid "nogroup"
 end
 
-["/usr/lib/zookeeper-#{node[:zookeeper][:version]}", "/etc/zookeeper"].each do |dir|
-  directory dir do
-    owner "root"
-    group "root"
-    mode 0755
-  end
+directory node[:zookeeper][:conf_dir] do
+  owner "root"
+  group "root"
+  mode 0755
 end
 
-["/var/log/zookeeper", "/var/lib/zookeeper"].each do |dir|
+[node[:zookeeper][:log_dir], node[:zookeeper][:var_dir], node[:zookeeper][:data_dir]].each do |dir|
   directory dir do
+    recursive true
     owner "zookeeper"
     group "nogroup"
     mode 0755
@@ -53,7 +53,7 @@ if node[:ec2]
   end
 
   # put lib dir on /mnt
-  mount "/var/lib/zookeeper" do
+  mount node[:zookeeper][:var_dir] do
     device "/mnt/zookeeper"
     fstype "none"
     options "bind,rw"
@@ -61,60 +61,28 @@ if node[:ec2]
   end
 end
 
-bash "untar zookeeper" do
-  user "root"
-  cwd "/tmp"
-  code %(tar zxf /tmp/zookeeper-#{node[:zookeeper][:version]}.tar.gz)
-  not_if { File.exists? "/tmp/zookeeper-#{node[:zookeeper][:version]}" }
-end
-
-bash "copy zk root" do
-  user "root"
-  cwd "/tmp"
-  code %(cp -r /tmp/zookeeper-#{node[:zookeeper][:version]}/* /usr/lib/zookeeper-#{node[:zookeeper][:version]})
-  not_if { File.exists? "/usr/lib/zookeeper-#{node[:zookeeper][:version]}/lib" }
-end
-
-link "/usr/lib/zookeeper" do
-  to "/usr/lib/zookeeper-#{node[:zookeeper][:version]}"
-end
-
-bash "copy zk conf" do
-  user "root"
-  cwd "/usr/lib/zookeeper"
-  code %(cp -R ./conf/* /etc/zookeeper)
-  not_if { File.exists? "/etc/zookeeper/log4j.properties" }
-end
-
-template "/etc/zookeeper/log4j.properties" do
+template ::File.join(node[:zookeeper][:conf_dir], "log4j.properties") do
   source "log4j.properties.erb"
   mode 0644
 end
 
-if node.role?("zookeeper")
-  zk_servers = [node]
+if Chef::Config[:solo]
+  zk_servers = [node] + node['zookeeper']['nodes']
 else
-  zk_servers = []
+  zk_servers = node.role?("zookeeper") ? [node] : []
+  zk_servers += search(:node, "role:zookeeper AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
+  zk_servers.sort! { |a, b| a.name <=> b.name }
 end
-zk_servers += search(:node, "role:zookeeper AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
 
-zk_servers.sort! { |a, b| a.name <=> b.name }
 
 template "/etc/zookeeper/zoo.cfg" do
   source "zoo.cfg.erb"
   mode 0644
   variables(:servers => zk_servers)
+  notifies :restart, "runit_service[zookeeper]"
 end
 
 #include_recipe "zookeeper::ebs_volume"
-
-directory node[:zookeeper][:data_dir] do
-  recursive true
-  owner "zookeeper"
-  group "nogroup"
-  mode 0755
-end
-
 myid = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
 
 template "#{node[:zookeeper][:data_dir]}/myid" do
@@ -125,7 +93,3 @@ template "#{node[:zookeeper][:data_dir]}/myid" do
 end
 
 runit_service "zookeeper"
-
-service "zookeeper" do
-  subscribes :restart, resources(:template => "/etc/zookeeper/zoo.cfg")
-end

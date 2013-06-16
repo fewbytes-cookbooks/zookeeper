@@ -1,15 +1,24 @@
-set_unless[:zookeeper][:cluster_name] = "default"
+default["zookeeper"]["cluster_name"] = "default"
 
 # ZK defaults
-set_unless[:zookeeper][:tick_time] = 2000
-set_unless[:zookeeper][:init_limit] = 10
-set_unless[:zookeeper][:sync_limit] = 5
-set_unless[:zookeeper][:client_port] = 2181
-set_unless[:zookeeper][:peer_port] = 2888
-set_unless[:zookeeper][:leader_port] = 3888
+default["zookeeper"]["tick_time"] = 2000
+default["zookeeper"]["init_limit"] = 10
+default["zookeeper"]["sync_limit"] = 5
+default["zookeeper"]["client_port"] = 2181
+default["zookeeper"]["peer_port"] = 2888
+default["zookeeper"]["leader_port"] = 3888
 
-set_unless[:zookeeper][:data_dir] = "/var/lib/zookeeper/data"
-set_unless[:zookeeper][:version] = "3.3.0"
+default["zookeeper"]["log_dir"] = "/var/log/zookeeper"
+default["zookeeper"]["var_dir"] = "/var/lib/zookeeper"
+default["zookeeper"]["data_dir"] = ::File.join(zookeeper['var_dir'], "data")
+default["zookeeper"]["conf_dir"] = "/etc/zookeeper"
+default["zookeeper"]["version"] = "3.3.0"
 
-set_unless[:zookeeper][:ebs_vol_dev] = "/dev/sdp"
-set_unless[:zookeeper][:ebs_vol_size] = 10
+default["zookeeper"]["ebs_vol_dev"] = "/dev/sdp"
+default["zookeeper"]["ebs_vol_size"] = 10
+
+# For chef solo, fill in the nessecary data for remote zookeeper nodes:
+# default["zookeeper"]["nodes"] = [ {:ipaddress => "192.168.1.23", :zookeeper => {:peer_port => 2888, :leader_port => 3888}} ]
+default["zookeeper"]["nodes"] = []
+
+default["zookeeper"]["checksum"] = nil
