@@ -20,8 +20,9 @@ include_recipe "java"
 include_recipe "runit"
 
 ark "zookeeper" do
-  url "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
+  url node[:zookeeper][:download_url]
   checksum node[:zookeeper][:checksum] if node[:zookeeper][:checksum]
+  version node[:zookeeper][:version]
   action :install
 end
 
