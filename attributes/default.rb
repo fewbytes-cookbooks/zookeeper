@@ -19,9 +19,11 @@ default["zookeeper"]["ebs_vol_size"] = 10
 # For chef solo, fill in the nessecary data for remote zookeeper nodes:
 # default["zookeeper"]["nodes"] = [ {:ipaddress => "192.168.1.23", :zookeeper => {:peer_port => 2888, :leader_port => 3888}} ]
 default["zookeeper"]["nodes"] = []
+# For chef client, perform a search for nodes with this role and with same cluster_name
+default["zookeeper"]["server_role"] = "zookeeper"
 
-default["zookeeper"]["version"] = "3.3.0"
-default["zookeeper"]["checksum"] = "192a33eaf547f46f95ca60803165e1fda8ead271f2558b1bf817d869e2fc4a14" # zookeeper 3.3.0
-default["zookeeper"]["download_url"] = "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
+default["zookeeper"]["version"] = "3.3.6"
+default["zookeeper"]["checksum"] = "eb311ec0479a9447d075a20350ecfc5cf6a2a6d9842d13b59d7548430ac37521" # zookeeper 3.3.6
+default["zookeeper"]["download_url"] = "http://www.us.apache.org/dist/zookeeper/#{node[:zookeeper][:version]}/#{node[:zookeeper][:version]}.tar.gz"
 
 default["zookeeper"]["quorum_size"] = 1

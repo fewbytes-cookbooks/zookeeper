@@ -15,3 +15,4 @@ end
 depends "java"
 depends "runit", ">= 1.0.0"
 depends "ark"
+depends "partial_search"

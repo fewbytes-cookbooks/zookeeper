@@ -2,7 +2,7 @@
  
 ### ZooKeeper specific settings
  
-ZOOKEEPER_SERVERS = "<%= @zk_servers.collect { |s| "#{s[:hostname]}:#{s[:zookeeper][:client_port]}" }.join(",") %>"
+ZOOKEEPER_SERVERS = "<%= @zk_servers.collect { |s| "#{s["hostname"]}:#{s["zookeeper"]["client_port"]}" }.join(",") %>"
  
 ### From here down are Django settings
  

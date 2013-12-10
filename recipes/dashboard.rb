@@ -7,10 +7,13 @@ bash "install dashboard" do
   code %(git clone git://github.com/phunt/zookeeper_dashboard.git)
 end
 
-zk_servers = search(:node, "role:zookeeper")[0]
+zk_servers = partial_search(:node, 
+	"role:#{node["zookeeper"]["server_role"]} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]}",
+	:keys => {"name" => ["name"], "ipaddress" => ["ipaddress"], "hostname" => ["hostname"], "zookeeper" => ["zookeeper"]}
+	).first
 
 template "/usr/local/zookeeper_dashboard/settings.py" do
-  source "settings.py.erb"
+  source "dashboar/settings.py.erb"
   mode 0644
   variables(:zk_servers => zk_servers)
 end

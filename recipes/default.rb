@@ -68,16 +68,17 @@ template ::File.join(node[:zookeeper][:conf_dir], "log4j.properties") do
 end
 
 if Chef::Config[:solo]
-  zk_servers = [node] + node['zookeeper']['nodes']
+  zk_servers = [node.to_hash] + node['zookeeper']['nodes']
 else
-  zk_servers = node.role?("zookeeper") ? [node] : []
-  zk_servers += search(:node, "role:zookeeper AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}") # don't include this one, since it's already in the list
-  zk_servers.sort! { |a, b| a.name <=> b.name }
+  zk_servers = node.role?(node["zookeeper"]["server_role"]) ? [node.to_hash] : []
+  zk_servers += partial_search(:node, "role:#{node["zookeeper"]["server_role"]} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}",
+    :keys => {'name' => ["name"], "ipaddress" => ["ipaddress"], "zookeeper" => ["zookeeper"]}) # don't include this one, since it's already in the list
+  zk_servers.sort! { |a, b| a["name"] <=> b["name"] }
 end
 
 if zk_servers.count > node["zookeeper"]["quorum_size"]
-  ::Chef::Application.fatal!("Found more zookeeper servers then the expected size of the quorum. Cowardly refusing to proceed")
-elsif zk_servers < node["zookeeper"]["quorum_size"]
+  ::Chef::Application.fatal!("Found more zookeeper servers then the expected size of the quorum. Cowardly refusing to proceed. Zookeeper nodes: #{zk_servers}")
+elsif zk_servers.count < node["zookeeper"]["quorum_size"]
   ::Chef::Log.warn("Not enough zookeeper servers found (expected #{node["zookeeper"]["quorum_size"]}), skipping zookeeper configuration")
 else
   template "/etc/zookeeper/zoo.cfg" do
@@ -89,14 +90,14 @@ else
 
   #include_recipe "zookeeper::ebs_volume"
   unless node["zookeeper"]["myid"]
-    node.set["zookeeper"]["myid"] = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
+    node.set["zookeeper"]["myid"] = zk_servers.collect { |n| n["ipaddress"] }.index(node["ipaddress"])
   end
 
   template "#{node[:zookeeper][:data_dir]}/myid" do
     source "myid.erb"
     owner "zookeeper"
     group "nogroup"
-    variables(:myid => myid)
+    variables(:myid => node["zookeeper"]["myid"])
   end
 
   runit_service "zookeeper"  
