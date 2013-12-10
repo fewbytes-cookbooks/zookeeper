@@ -23,3 +23,5 @@ default["zookeeper"]["nodes"] = []
 default["zookeeper"]["version"] = "3.3.0"
 default["zookeeper"]["checksum"] = "192a33eaf547f46f95ca60803165e1fda8ead271f2558b1bf817d869e2fc4a14" # zookeeper 3.3.0
 default["zookeeper"]["download_url"] = "https://archive.apache.org/dist/hadoop/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
+
+default["zookeeper"]["quorum_size"] = 1

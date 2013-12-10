@@ -75,22 +75,30 @@ else
   zk_servers.sort! { |a, b| a.name <=> b.name }
 end
 
+if zk_servers.count > node["zookeeper"]["quorum_size"]
+  ::Chef::Application.fatal("Found more zookeeper servers then the expected size of the quorum. Cowardly refusing to proceed")
+elsif zk_servers < node["zookeeper"]["quorum_size"]
+  ::Chef::Log.warn("Not enough zookeeper servers found (expected #{node["zookeeper"]["quorum_size"]}), skipping zookeeper configuration")
+else
+  template "/etc/zookeeper/zoo.cfg" do
+    source "zoo.cfg.erb"
+    mode 0644
+    variables(:servers => zk_servers)
+    notifies :restart, "runit_service[zookeeper]"
+  end
 
-template "/etc/zookeeper/zoo.cfg" do
-  source "zoo.cfg.erb"
-  mode 0644
-  variables(:servers => zk_servers)
-  notifies :restart, "runit_service[zookeeper]"
-end
+  #include_recipe "zookeeper::ebs_volume"
+  unless node["zookeeper"]["myid"]
+    node.set["zookeeper"]["myid"] = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
+  end
 
-#include_recipe "zookeeper::ebs_volume"
-myid = zk_servers.collect { |n| n[:ipaddress] }.index(node[:ipaddress])
+  template "#{node[:zookeeper][:data_dir]}/myid" do
+    source "myid.erb"
+    owner "zookeeper"
+    group "nogroup"
+    variables(:myid => myid)
+  end
 
-template "#{node[:zookeeper][:data_dir]}/myid" do
-  source "myid.erb"
-  owner "zookeeper"
-  group "nogroup"
-  variables(:myid => myid)
-end
+  runit_service "zookeeper"  
+end  
 
-runit_service "zookeeper"

@@ -3,7 +3,7 @@ maintainer_email "ops@gotime.com"
 license          "Apache 2.0"
 description      "Installs/Configures zookeeper"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
-version          "0.2"
+version          "0.3.0"
 
 recipe "zookeeper::default", "Installs and configures zookeeper"
 recipe "zookeeper::ebs_volume", "Attaches or creates an EBS volume for zookeeper"
