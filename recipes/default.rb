@@ -76,7 +76,7 @@ else
 end
 
 if zk_servers.count > node["zookeeper"]["quorum_size"]
-  ::Chef::Application.fatal("Found more zookeeper servers then the expected size of the quorum. Cowardly refusing to proceed")
+  ::Chef::Application.fatal!("Found more zookeeper servers then the expected size of the quorum. Cowardly refusing to proceed")
 elsif zk_servers < node["zookeeper"]["quorum_size"]
   ::Chef::Log.warn("Not enough zookeeper servers found (expected #{node["zookeeper"]["quorum_size"]}), skipping zookeeper configuration")
 else
