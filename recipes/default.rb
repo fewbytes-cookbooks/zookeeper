@@ -79,7 +79,11 @@ if Chef::Config[:solo]
 else
   zk_servers = node.role?(node["zookeeper"]["server_role"]) ? [node.to_hash] : []
   zk_servers += partial_search(:node, "role:#{node["zookeeper"]["server_role"]} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}",
-    :keys => {'name' => ["name"], "ipaddress" => ["ipaddress"], "zookeeper" => ["zookeeper"]}) # don't include this one, since it's already in the list
+    :keys => {
+      'name' => ["name"], 
+      "ipaddress" => ["ipaddress"], 
+      "zookeeper" => ["zookeeper"]
+    }) # don't include this one, since it's already in the list
   zk_servers.sort! { |a, b| a["name"] <=> b["name"] }
 end
 
@@ -97,7 +101,8 @@ else
 
   #include_recipe "zookeeper::ebs_volume"
   unless node["zookeeper"]["myid"]
-    node.set["zookeeper"]["myid"] = zk_servers.collect { |n| n["ipaddress"] }.index(node["ipaddress"])
+    require 'ipaddr'
+    node.set["zookeeper"]["myid"] = IPAddr.new(n["ipaddress"]).to_i
   end
 
   template "#{node[:zookeeper][:data_dir]}/myid" do

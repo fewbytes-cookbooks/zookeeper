@@ -17,8 +17,8 @@ dataLogDir=<%= @node["zookeeper"]["data_log_dir"] %>
 clientPort=<%= @node["zookeeper"]["client_port"] %>
 
 <% if @servers.size > 1 -%>
-  <% @servers.each_with_index do |server, i| %>
-server.<%= i %>=<%= server["ipaddress"] %>:<%= server["zookeeper"]["peer_port"] %>:<%= server["zookeeper"]["leader_port"] %>
+  <% @servers.each do |server| %>
+server.<%= server["zookeeper"]["myid"] %>=<%= server["ipaddress"] %>:<%= server["zookeeper"]["peer_port"] %>:<%= server["zookeeper"]["leader_port"] %>
   <% end -%>
 <% else -%>
   <% server = @servers.first -%>
