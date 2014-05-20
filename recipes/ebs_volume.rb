@@ -89,7 +89,7 @@ if node[:ec2]
     device ebs_vol_dev
     action [:create, :attach]
     provider "aws_ebs_volume"
-    notifies :create, resources(:ruby_block => "store_#{data_dir}_#{node[:zookeeper][:cluster_name]}_volid"), :immediately
+    notifies :create, "ruby_block[store_#{data_dir}_#{node[:zookeeper][:cluster_name]}_volid]", :immediately
   end
 
   execute "mkfs.xfs #{ebs_vol_dev}" do

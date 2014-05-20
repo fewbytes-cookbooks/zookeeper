@@ -42,7 +42,7 @@ if node[:ec2]
   directory "/mnt/zookeeper" do
     owner "zookeeper"
     group "nogroup"
-    mode 0755
+    mode 00755
   end
 
   # put lib dir on /mnt
@@ -57,7 +57,7 @@ end
 directory node[:zookeeper][:conf_dir] do
   owner "root"
   group "root"
-  mode 0755
+  mode 00755
 end
 
 [node[:zookeeper][:log_dir], node[:zookeeper][:data_dir]].each do |dir|
@@ -65,13 +65,13 @@ end
     recursive true
     owner "zookeeper"
     group "nogroup"
-    mode 0755
+    mode 00755
   end
 end
 
 template ::File.join(node[:zookeeper][:conf_dir], "log4j.properties") do
   source "log4j.properties.erb"
-  mode 0644
+  mode 00644
 end
 
 if Chef::Config[:solo]
@@ -90,7 +90,7 @@ elsif zk_servers.count < node["zookeeper"]["quorum_size"]
 else
   template "/etc/zookeeper/zoo.cfg" do
     source "zoo.cfg.erb"
-    mode 0644
+    mode 00644
     variables(:servers => zk_servers)
     notifies :restart, "runit_service[zookeeper]"
   end
