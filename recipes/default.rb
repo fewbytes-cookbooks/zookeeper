@@ -102,7 +102,7 @@ else
   #include_recipe "zookeeper::ebs_volume"
   unless node["zookeeper"]["myid"]
     require 'ipaddr'
-    node.set["zookeeper"]["myid"] = IPAddr.new(n["ipaddress"]).to_i
+    node.set["zookeeper"]["myid"] = IPAddr.new(node["ipaddress"]).to_i
   end
 
   template "#{node[:zookeeper][:data_dir]}/myid" do
