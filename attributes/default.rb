@@ -24,6 +24,6 @@ default["zookeeper"]["server_role"] = "zookeeper"
 
 default["zookeeper"]["version"] = "3.4.6"
 default["zookeeper"]["checksum"] = "01b3938547cd620dc4c93efe07c0360411f4a66962a70500b163b59014046994" # zookeeper 3.4.6
-default["zookeeper"]["download_url"] = "http://www.us.apache.org/dist/zookeeper/#{node[:zookeeper][:version]}/#{node[:zookeeper][:version]}.tar.gz"
+default["zookeeper"]["download_url"] = "http://www.us.apache.org/dist/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
 
 default["zookeeper"]["quorum_size"] = 1
