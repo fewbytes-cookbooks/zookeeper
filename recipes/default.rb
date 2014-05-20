@@ -31,19 +31,11 @@ user "zookeeper" do
   gid "nogroup"
 end
 
-directory node[:zookeeper][:conf_dir] do
-  owner "root"
-  group "root"
-  mode 0755
-end
-
-[node[:zookeeper][:log_dir], node[:zookeeper][:var_dir], node[:zookeeper][:data_dir]].each do |dir|
-  directory dir do
-    recursive true
-    owner "zookeeper"
-    group "nogroup"
-    mode 0755
-  end
+directory node[:zookeeper][:var_dir] do
+  owner true
+  owner "zookeeper"
+  group "nogroup"
+  mode 00755
 end
 
 if node[:ec2]
@@ -59,6 +51,21 @@ if node[:ec2]
     fstype "none"
     options "bind,rw"
     action :mount
+  end
+end
+
+directory node[:zookeeper][:conf_dir] do
+  owner "root"
+  group "root"
+  mode 0755
+end
+
+[node[:zookeeper][:log_dir], node[:zookeeper][:data_dir]].each do |dir|
+  directory dir do
+    recursive true
+    owner "zookeeper"
+    group "nogroup"
+    mode 0755
   end
 end
 
