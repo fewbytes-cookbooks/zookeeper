@@ -1,10 +1,10 @@
 include_recipe "django"
 include_recipe "git"
 
-bash "install dashboard" do
+git "/usr/local/zookeeper_dashboard" do
+  repository "git://github.com/phunt/zookeeper_dashboard.git"
   user "root"
-  cwd "/usr/local"
-  code %(git clone git://github.com/phunt/zookeeper_dashboard.git)
+  action :sync
 end
 
 zk_servers = partial_search(:node, 
@@ -13,7 +13,7 @@ zk_servers = partial_search(:node,
 	).first
 
 template "/usr/local/zookeeper_dashboard/settings.py" do
-  source "dashboar/settings.py.erb"
+  source "dashboard/settings.py.erb"
   mode 0644
   variables(:zk_servers => zk_servers)
 end
