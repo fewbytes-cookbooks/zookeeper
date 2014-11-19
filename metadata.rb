@@ -1,3 +1,4 @@
+name             "zookeeper"
 maintainer       "GoTime Inc."
 maintainer_email "ops@gotime.com"
 license          "Apache 2.0"
