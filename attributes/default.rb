@@ -13,6 +13,7 @@ default["zookeeper"]["var_dir"] = "/var/lib/zookeeper"
 default["zookeeper"]["data_dir"] = ::File.join(zookeeper['var_dir'], "data")
 default["zookeeper"]["conf_dir"] = "/etc/zookeeper"
 
+default["zookeeper"]["ec2"]["dir"] = "/mnt/zookeeper"
 default["zookeeper"]["ebs_vol_dev"] = "/dev/sdp"
 default["zookeeper"]["ebs_vol_size"] = 10
 

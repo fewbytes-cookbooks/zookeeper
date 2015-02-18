@@ -20,9 +20,9 @@ include_recipe "java"
 include_recipe "runit"
 
 ark "zookeeper" do
-  url node[:zookeeper][:download_url]
-  checksum node[:zookeeper][:checksum] if node[:zookeeper][:checksum]
-  version node[:zookeeper][:version]
+  url node["zookeeper"]["download_url"]
+  checksum node["zookeeper"]["checksum"] if node["zookeeper"]["checksum"]
+  version node["zookeeper"]["version"]
   action :install
 end
 
@@ -31,22 +31,22 @@ user "zookeeper" do
   gid "nogroup"
 end
 
-directory node[:zookeeper][:var_dir] do
+directory node["zookeeper"]["var_dir"] do
   owner true
   owner "zookeeper"
   group "nogroup"
   mode 00755
 end
 
-if node[:ec2]
-  directory "/mnt/zookeeper" do
+if node["ec2"]
+  directory node["zookeeper"]["ec2"]["dir"] do
     owner "zookeeper"
     group "nogroup"
     mode 00755
   end
 
   # put lib dir on /mnt
-  mount node[:zookeeper][:var_dir] do
+  mount node["zookeeper"]["var_dir"] do
     device "/mnt/zookeeper"
     fstype "none"
     options "bind,rw"
@@ -54,13 +54,13 @@ if node[:ec2]
   end
 end
 
-directory node[:zookeeper][:conf_dir] do
+directory node["zookeeper"]["conf_dir"] do
   owner "root"
   group "root"
   mode 00755
 end
 
-[node[:zookeeper][:log_dir], node[:zookeeper][:data_dir]].each do |dir|
+[node["zookeeper"]["log_dir"], node["zookeeper"]["data_dir"]].each do |dir|
   directory dir do
     recursive true
     owner "zookeeper"
@@ -69,16 +69,16 @@ end
   end
 end
 
-template ::File.join(node[:zookeeper][:conf_dir], "log4j.properties") do
+template ::File.join(node["zookeeper"]["conf_dir"], "log4j.properties") do
   source "log4j.properties.erb"
   mode 00644
 end
 
-if Chef::Config[:solo]
+if Chef::Config["solo"] or node["zookeeper"]["quorum_size"] == 1
   zk_servers = [node.to_hash] + node['zookeeper']['nodes']
 else
   zk_servers = node.role?(node["zookeeper"]["server_role"]) ? [node.to_hash] : []
-  zk_servers += partial_search(:node, "role:#{node["zookeeper"]["server_role"]} AND zookeeper_cluster_name:#{node[:zookeeper][:cluster_name]} NOT name:#{node.name}",
+  zk_servers += partial_search(:node, "role:#{node["zookeeper"]["server_role"]} AND zookeeper_cluster_name:#{node["zookeeper"]["cluster_name"]} NOT name:#{node.name}",
     :keys => {
       'name' => ["name"], 
       "ipaddress" => ["ipaddress"], 
@@ -105,7 +105,7 @@ else
     node.set["zookeeper"]["myid"] = IPAddr.new(node["ipaddress"]).to_i
   end
 
-  template "#{node[:zookeeper][:data_dir]}/myid" do
+  template "#{node["zookeeper"]["data_dir"]}/myid" do
     source "myid.erb"
     owner "zookeeper"
     group "nogroup"
