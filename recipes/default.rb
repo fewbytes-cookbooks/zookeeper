@@ -74,7 +74,9 @@ template ::File.join(node["zookeeper"]["conf_dir"], "log4j.properties") do
   mode 00644
 end
 
-if Chef::Config["solo"] or node["zookeeper"]["quorum_size"] == 1
+if node["zookeeper"]["quorum_size"] == 1
+  zk_servers = [node.to_hash]
+elsif Chef::Config["solo"]
   zk_servers = [node.to_hash] + node['zookeeper']['nodes']
 else
   zk_servers = node.role?(node["zookeeper"]["server_role"]) ? [node.to_hash] : []
