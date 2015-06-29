@@ -28,3 +28,5 @@ default["zookeeper"]["checksum"] = "01b3938547cd620dc4c93efe07c0360411f4a66962a7
 default["zookeeper"]["download_url"] = "http://www.us.apache.org/dist/zookeeper/zookeeper-#{node[:zookeeper][:version]}/zookeeper-#{node[:zookeeper][:version]}.tar.gz"
 
 default["zookeeper"]["quorum_size"] = 1
+
+default["zookeeper"]["snapshots_to_keep"] = 10

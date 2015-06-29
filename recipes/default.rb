@@ -18,6 +18,7 @@
 #
 include_recipe "java"
 include_recipe "runit"
+include_recipe "zookeeper::maintenance"
 
 ark "zookeeper" do
   url node["zookeeper"]["download_url"]
