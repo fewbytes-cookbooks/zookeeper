@@ -18,7 +18,6 @@
 #
 include_recipe "java"
 include_recipe "runit"
-include_recipe "zookeeper::maintenance"
 
 ark "zookeeper" do
   url node["zookeeper"]["download_url"]
@@ -69,6 +68,9 @@ end
     mode 00755
   end
 end
+
+# Installing the cron job required zookeeper installed
+include_recipe "zookeeper::maintenance"
 
 template ::File.join(node["zookeeper"]["conf_dir"], "log4j.properties") do
   source "log4j.properties.erb"
