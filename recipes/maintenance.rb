@@ -5,7 +5,5 @@ cron "zookeeper_data_cleanup" do
     time :daily
     shell "/bin/bash"
     path "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    command <<-EOH
-        java -cp "#{node["zookeeper"]["conf_dir"]}:/usr/local/zookeeper/*:/usr/local/zookeeper/lib/*" org.apache.zookeeper.server.PurgeTxnLog "#{node["zookeeper"]["data_dir"]}" "#{node["zookeeper"]["data_dir"]}" -n "#{node["zookeeper"]["snapshots_to_keep"]}"
-    EOH
+    command "java -cp #{node["zookeeper"]["conf_dir"]}:/usr/local/zookeeper/*:/usr/local/zookeeper/lib/* org.apache.zookeeper.server.PurgeTxnLog #{node["zookeeper"]["data_dir"]} #{node["zookeeper"]["data_dir"]} -n #{node["zookeeper"]["snapshots_to_keep"]}"
 end
