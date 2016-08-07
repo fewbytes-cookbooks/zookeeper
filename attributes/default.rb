@@ -29,4 +29,5 @@ default["zookeeper"]["download_url"] = "http://www.us.apache.org/dist/zookeeper/
 
 default["zookeeper"]["quorum_size"] = 1
 
+default["zookeeper"]["maint_cron_time"] = "daily"
 default["zookeeper"]["snapshots_to_keep"] = 10
